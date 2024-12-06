@@ -7,7 +7,7 @@ const vehicleSchema = new Schema({
     minLength: [3, "Color must be atleast 3 characters long."],
   },
   capacity: {
-    type: Number,
+    type: String,
     required: true,
     minLength: [1, "Capacity must be atleast 1."],
   },
@@ -15,6 +15,7 @@ const vehicleSchema = new Schema({
   licensePlate: {
     type: String,
     required: true,
+    unique: true,
     minLength: [3, "License Plate number must be atleast 3 characters long."],
   },
 

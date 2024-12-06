@@ -8,7 +8,6 @@ import mongoose from "mongoose";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password } = req.body;
-
   const { firstName, lastName } = fullName;
 
   if (
@@ -35,9 +34,14 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   const token = user.generateAccessToken();
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  res.cookie("user_token", token, options);
   return res
     .status(201)
-    .json(new ApiResponse(200, "User created successfully", { user, token }));
+    .json(new ApiResponse(200, { user, token }, "User created successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -53,9 +57,14 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const token = user.generateAccessToken();
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  res.cookie("user_token", token, options);
   return res
     .status(200)
-    .json(new ApiResponse(200, "User logged in successfully", { user, token }));
+    .json(new ApiResponse(200, { user, token }, "User logged in successfully"));
 });
 
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -65,11 +74,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
   return res
     .status(200)
-    .json(new ApiResponse(200, "User profile fetched successfully", { user }));
+    .json(new ApiResponse(200, { user }, "User profile fetched successfully"));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("user_token");
   const token =
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");

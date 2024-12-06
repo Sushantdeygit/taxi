@@ -2,11 +2,13 @@ import { Router } from "express";
 import {
   getAddressCoordinatesController,
   getDistanceAndTimeController,
+  getSuggestedAddressesController,
 } from "../controllers/maps.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   mapAddressValidator,
   mapDistanceAndTimeValidator,
+  mapSuggestedAddressesValidator,
   validateRequest,
 } from "../helpers/validators.js";
 
@@ -28,6 +30,14 @@ router
     mapDistanceAndTimeValidator(),
     validateRequest,
     getDistanceAndTimeController
+  );
+router
+  .route("/getSuggestedAddresses")
+  .post(
+    verifyJWT,
+    mapSuggestedAddressesValidator(),
+    validateRequest,
+    getSuggestedAddressesController
   );
 
 export default router;

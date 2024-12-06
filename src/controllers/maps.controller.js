@@ -3,7 +3,8 @@ import { ApiError } from "../utils/ApiError.js";
 import {
   getAddressCoordinates,
   getDistanceAndTime,
-} from "../../services/maps.service.js";
+  getSuggestedAddresses,
+} from "../services/maps.service.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const getAddressCoordinatesController = asyncHandler(async (req, res) => {
@@ -44,4 +45,26 @@ const getDistanceAndTimeController = asyncHandler(async (req, res) => {
   }
 });
 
-export { getAddressCoordinatesController, getDistanceAndTimeController };
+const getSuggestedAddressesController = asyncHandler(async (req, res) => {
+  const { address } = req.body;
+  if (!address) {
+    throw new ApiError(400, "Address is required");
+  }
+
+  const { suggestions } = await getSuggestedAddresses(address);
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        suggestions,
+        "Suggested addresses fetched successfully"
+      )
+    );
+});
+
+export {
+  getAddressCoordinatesController,
+  getDistanceAndTimeController,
+  getSuggestedAddressesController,
+};

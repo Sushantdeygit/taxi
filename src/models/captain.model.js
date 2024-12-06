@@ -29,10 +29,9 @@ const captainSchema = new Schema({
     type: String, //S3 Bucket
     required: true,
   },
-  //   socketId: {
-  //     type: String,
-  //     required: true,
-  //   },
+  socketId: {
+    type: String,
+  },
   status: {
     type: String,
     enum: ["active", "inactive"],
@@ -44,7 +43,7 @@ const captainSchema = new Schema({
     required: true,
   },
   location: {
-    lat: {
+    ltd: {
       type: Number,
     },
     lng: {

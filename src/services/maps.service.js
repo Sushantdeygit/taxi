@@ -1,4 +1,42 @@
 import axios from "axios";
+import { Captain } from "../models/captain.model.js";
+
+export const getSuggestedAddresses = async (address) => {
+  const GOOGLE_PLACES_API_URL =
+    "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+  try {
+    // Send a request to Google Places API
+
+    const response = await axios.get(GOOGLE_PLACES_API_URL, {
+      params: {
+        input: address.trim(), // The search query, i.e., location entered by the user
+        key: process.env.GOOGLE_MAPS_API_KEY, // API key
+        language: "en", // Language of the results
+        types: "geocode", // Restrict to geocoding results (places)
+        locationbias: "circle:5000@28.6139,77.2090", // Restrict to Delhi
+      },
+    });
+
+    // If Google API responds with predictions
+    if (response.data.status === "OK") {
+      let places = response.data.predictions;
+      let suggestions = [];
+      for (let i = 0; i < 4; i++) {
+        suggestions.push(response.data.predictions[i].description);
+      }
+      return {
+        suggestions,
+      };
+    } else {
+      console.log(response.data);
+
+      throw new Error("Error fetching location suggestions");
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error("Something went wrong, please try again later");
+  }
+};
 
 export const getAddressCoordinates = async (address) => {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -68,3 +106,17 @@ export const getDistanceAndTime = async (origin, destination) => {
     throw new Error("Error fetching distance and time");
   }
 };
+
+export async function getCaptainsInRadius(ltd, lng, radius) {
+  console.log(ltd, lng, radius);
+  //radius in km
+  const captains = await Captain.find({
+    location: {
+      $geoWithin: {
+        $centerSphere: [[ltd, lng], radius / 6371],
+      },
+    },
+  });
+
+  return captains;
+}

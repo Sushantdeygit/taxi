@@ -23,12 +23,12 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
+    minLength: [6, "Password should be at least 6 characters long"],
     select: false,
   },
-  //   socketId: {
-  //     type: String,
-  //     required: true,
-  //   },
+  socketId: {
+    type: String,
+  },
 });
 
 userSchema.methods.generateAccessToken = function () {

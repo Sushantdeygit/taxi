@@ -14,15 +14,15 @@ import {
 import { verifyCaptainJWT } from "../middlewares/auth.middleware.js";
 const router = Router();
 
-router
-  .route(
-    "/register",
-    upload.fields([
-      { name: "profilePicture", maxCount: 1 },
-      { name: "vehicleImage", maxCount: 1 },
-    ])
-  )
-  .post(captainregisterValidator(), validateRequest, registerCaptain);
+router.route("/register").post(
+  upload.fields([
+    { name: "profilePicture", maxCount: 1 },
+    { name: "vehicleImage", maxCount: 1 },
+  ]),
+  captainregisterValidator(),
+  validateRequest,
+  registerCaptain
+);
 
 router.route("/login").post(loginValidator(), validateRequest, loginCaptain);
 
