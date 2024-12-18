@@ -4,7 +4,9 @@ services:
     container_name: taxi_management_backend
     build: . # Build the image from the Dockerfile in the current directory
     ports:
-      - "8000:8000"
+      - "8000:8000" # Map port 8000 of the container to port 8000 on the host
+    env_file:
+      - .env # Load environment variables from the .env file
     environment:
-      - PORT=8000
-    restart: always
+      - PORT=8000 # This overrides the value in the .env file if present
+    restart: always # Restart the container automatically if it stops
