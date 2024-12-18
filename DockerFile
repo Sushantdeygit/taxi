@@ -1,23 +1,19 @@
-# Use a Node.js image
 FROM node:20
 
-# Set the working directory inside the container
+# Set the working directory in the container
 WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (including devDependencies like nodemon)
 RUN npm install
 
-# Install nodemon globally (if it's not in your `package.json`)
-RUN npm install -g nodemon
-
-# Copy the rest of the application code
+# Copy the rest of your project files
 COPY . .
 
 # Expose the application's port
 EXPOSE 8000
 
-# Start the application in development mode
+# Command to start the application
 CMD ["npm", "run", "dev"]
