@@ -4,8 +4,6 @@ services:
     container_name: taxi_management_backend
     image: node:20 # Use an official Node.js image (or your custom image)
     working_dir: /app # Set the working directory in the container
-    volumes:
-      - .:/app # Mount the current directory to `/app` in the container
     ports:
       - "8000:8000"
     environment:
