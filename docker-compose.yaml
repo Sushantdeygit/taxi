@@ -2,7 +2,7 @@ version: "3"
 services:
   backend:
     container_name: taxi_management_backend
-    build: . # Build the image from the Dockerfile in the current directories
+    build: . # Build the image from the Dockerfile in the current directory
     ports:
       - "8000:8000"
     environment:
