@@ -50,6 +50,12 @@ const captainSchema = new Schema({
       type: Number,
     },
   },
+  earnings: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Earning",
+    },
+  ],
 });
 
 captainSchema.methods.generateAccessToken = function () {

@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Ride } from "../models/ride.model.js";
 import { Captain } from "../models/captain.model.js";
 import { User } from "../models/user.model.js";
+import { Earning } from "../models/earning.model.js";
 import {
   createRide,
   fareCalculation,
@@ -20,7 +21,6 @@ import { sendMessageToSocketId } from "../socket.js";
 
 const createRideController = asyncHandler(async (req, res) => {
   const { startLocation, endLocation, vehicleType } = req.body;
-  console.log(req.user);
 
   if (!startLocation || !endLocation || !vehicleType) {
     throw new ApiError(400, "All fields are required");
@@ -34,6 +34,7 @@ const createRideController = asyncHandler(async (req, res) => {
   });
 
   const pickUpCoords = await getAddressCoordinates(startLocation);
+  const destinationCoords = await getAddressCoordinates(endLocation);
   const captainsInRadius = await getCaptainsInRadius(
     pickUpCoords.lat,
     pickUpCoords.lng,
@@ -45,10 +46,13 @@ const createRideController = asyncHandler(async (req, res) => {
     "user"
   );
   captainsInRadius.forEach((captain) => {
-    console.log("nigga:", captain);
     sendMessageToSocketId(captain.socketId, {
       event: "new-ride",
-      data: rideWithUserData,
+      data: {
+        ride: rideWithUserData,
+        pickUpCoords,
+        destinationCoords,
+      },
     });
   });
 
@@ -78,11 +82,25 @@ const confirmRideController = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Ride id is required");
   }
 
+  const startLocation = await Ride.findOne({ _id: rideId }).select(
+    "startLocation"
+  );
+  const endLocation = await Ride.findOne({ _id: rideId }).select("endLocation");
+
+  const pickUpCoords = await getAddressCoordinates(startLocation);
+  const destinationCoords = await getAddressCoordinates(endLocation);
+
+  console.log("nidde:", pickUpCoords, destinationCoords);
+
   const ride = await confirmRide({ rideId, captain: req.captain });
 
   sendMessageToSocketId(ride.user.socketId, {
     event: "ride-confirmed",
-    data: ride,
+    data: {
+      ride,
+      pickUpCoords,
+      destinationCoords,
+    },
   });
   return res
     .status(200)
@@ -95,8 +113,6 @@ const startRideController = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid input");
   }
   const ride = await startRide({ rideId, otp, captain: req.captain });
-
-  console.log(ride);
 
   sendMessageToSocketId(ride.user.socketId, {
     event: "ride-started",
@@ -117,6 +133,12 @@ const endRideController = asyncHandler(async (req, res) => {
   sendMessageToSocketId(ride.user.socketId, {
     event: "ride-ended",
     data: ride,
+  });
+
+  await Earning.create({
+    captain: req.captain._id,
+    amount: ride.fare,
+    date: new Date(),
   });
 
   return res.status(200).json(new ApiResponse(200, "Ride ended successfully"));
