@@ -2,11 +2,14 @@ version: "3"
 services:
   backend:
     container_name: taxi_management_backend
-    image: node:20 # Use an official Node.js image (or your custom image)
+    image: node:20 # Use an official Node.js image
     working_dir: /app # Set the working directory in the container
     ports:
       - "8000:8000"
     environment:
       - PORT=8000
     restart: always
-    command: ["npm", "run", "dev"] # Command to run the backend (adjust to your project)
+    volumes:
+      - .:/app # Mount the current directory to /app inside the container
+      - /app/node_modules # Avoid overwriting node_modules in the container
+    command: ["npm", "run", "dev"] # Command to run the backend
